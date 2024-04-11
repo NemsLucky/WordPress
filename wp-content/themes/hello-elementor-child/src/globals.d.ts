@@ -1,0 +1,1 @@
+declare const jQuery: typeof import("jquery");

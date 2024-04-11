@@ -3,11 +3,13 @@
 if (!defined('ABSPATH')) exit;
 
 add_action('wp_enqueue_scripts', function () {
+    $script_file = get_stylesheet_directory_uri() . '/dist/script.js';
+    $style_file = get_stylesheet_directory_uri() . '/dist/style.css';
     wp_enqueue_style('parent-style', get_template_directory() . '/style.min.css');
     wp_enqueue_style('child_style', get_stylesheet_directory_uri() . '/style.css', ['parent-style']);
-    wp_enqueue_style('styles', get_stylesheet_directory_uri() . '/dist/style.css', [], time());
-    
-    wp_enqueue_script('main-script', get_stylesheet_directory_uri().'/dist/script.js', [], time(), ['strategy'=>'defer']);
+    wp_enqueue_style('styles', $style_file, [], filemtime($style_file));
+
+    wp_enqueue_script('main-script', $script_file, array('jquery'), filemtime($script_file), array('strategy' => 'defer'));
 });
 
 function custom_menu_shortcode($atts)
