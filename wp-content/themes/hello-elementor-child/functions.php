@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) exit;
 add_action('wp_enqueue_scripts', function () {
     $script_file = get_stylesheet_directory_uri() . '/dist/script.js';
     $style_file = get_stylesheet_directory_uri() . '/dist/style.css';
-    wp_enqueue_style('parent-style', get_template_directory() . '/style.min.css');
+    wp_enqueue_style('parent-style', get_template_directory() . '/style.css');
     wp_enqueue_style('child_style', get_stylesheet_directory_uri() . '/style.css', ['parent-style']);
     wp_enqueue_style('styles', $style_file, [], filemtime($style_file));
 
