@@ -1,0 +1,88 @@
+@mixin tablette() {
+  @media (max-width: 1023.98px) {
+    @content;
+  }
+}
+
+.pnh-custom-menu--main {
+  height: 100%;
+
+  .pnh-custom-menu {
+    display: flex;
+    flex-direction: row;
+    list-style: none;
+    overflow: hidden;
+    height: 100%;
+
+    @include tablette() {
+      height: 0px;
+
+      body.menu-open & {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 5vmin 4vmin 0;
+		    gap: .5rem;
+        width: 100%;
+        height: 100%;
+      }
+
+      .menu-item {
+        display: flex;
+        place-items: center;
+        justify-content: center;
+        padding: .5rem ;
+        width: 100%;
+
+        a {
+          width: fit-content;
+          font-size: 18px;
+          font-weight: 400;
+		      padding: 0;
+
+          &::after {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .menu-item {
+      height: 100%;
+
+      &.active a::after {
+        height: var(--pnh-menu-active-indicator-height, 3px);
+      }
+
+      a {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        place-items: center;
+        justify-content: center;
+        padding-inline: 1rem;
+        height: 100%;
+        color: inherit;
+
+        &:hover {
+          &::after {
+            height: var(--pnh-menu-active-indicator-height, 3px);
+          }
+        }
+
+        &::after {
+          position: absolute;
+          content: "";
+          width: var(--pnh-menu-active-indicator-width, 24px);
+          height: 0px;
+          bottom: 0;
+          border-radius: var(--pnh-menu-active-indicator-radius, 2px);
+          background-color: currentColor;
+          transition: all 250ms ease-in-out;
+          will-change: height, background-color;
+        }
+      }
+    }
+  }
+}

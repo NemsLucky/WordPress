@@ -1,81 +1,8 @@
-/* stylePlugin:/workspaces/WordPress/wp-content/themes/hello-elementor-child/src/styles/index.scss */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-#burger-ba,
-.burger .burger-box .burger-inner::before,
-.burger .burger-box .burger-inner::after {
-  position: absolute;
-  display: block;
-  top: calc((100% - 1px) / 2);
-  margin: auto;
-  content: "";
-  width: 100%;
-  height: 1px;
-  background: currentcolor;
-  will-change: transform, width;
-}
-.burger {
-  position: relative;
-  display: none;
-  cursor: pointer;
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
-  box-shadow: 0px 0px 5px -3px !important;
-}
-.burger:hover {
-  box-shadow: 0px 0px 5px -1px !important;
-}
-@media (max-width: 1023.98px) {
-  .burger {
-    display: inline-flex;
-    flex-direction: column;
-    place-items: center;
-    place-content: center;
-  }
-}
-.burger .burger-box {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-}
-.burger .burger-box .burger-inner {
-  position: relative;
-  width: 100%;
+/* stylePlugin:/workspaces/WordPress/wp-content/themes/pnembot-hello/src/styles/index.scss */
+.pnh-custom-menu--main {
   height: 100%;
 }
-.burger .burger-box .burger-inner::before,
-.burger .burger-box .burger-inner::after {
-  transition: transform 250ms cubic-bezier(0.2, 0.7, 0.3, 1), width 250ms cubic-bezier(0.2, 0.7, 0.3, 1);
-}
-.burger .burger-box .burger-inner::before {
-  transform: translatey(-6px);
-}
-.menu-open .burger .burger-box .burger-inner::before {
-  transform: rotate(135deg);
-}
-.burger .burger-box .burger-inner::after {
-  transform: translatey(5px);
-}
-.menu-open .burger .burger-box .burger-inner::after {
-  transform: rotate(-135deg);
-}
-body:not(.menu-open) .burger:hover .burger-inner::before {
-  transform: translatey(-8px);
-}
-body:not(.menu-open) .burger:hover .burger-inner::after {
-  transform: translatey(7px);
-}
-.custom-menu {
-  height: 100%;
-}
-.custom-menu .menu {
+.pnh-custom-menu--main .pnh-custom-menu {
   display: flex;
   flex-direction: row;
   list-style: none;
@@ -83,10 +10,10 @@ body:not(.menu-open) .burger:hover .burger-inner::after {
   height: 100%;
 }
 @media (max-width: 1023.98px) {
-  .custom-menu .menu {
+  .pnh-custom-menu--main .pnh-custom-menu {
     height: 0px;
   }
-  body.menu-open .custom-menu .menu {
+  body.menu-open .pnh-custom-menu--main .pnh-custom-menu {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -96,30 +23,30 @@ body:not(.menu-open) .burger:hover .burger-inner::after {
     width: 100%;
     height: 100%;
   }
-  .custom-menu .menu .menu-item {
+  .pnh-custom-menu--main .pnh-custom-menu .menu-item {
     display: flex;
     place-items: center;
     justify-content: center;
     padding: 0.5rem;
     width: 100%;
   }
-  .custom-menu .menu .menu-item a {
+  .pnh-custom-menu--main .pnh-custom-menu .menu-item a {
     width: fit-content;
     font-size: 18px;
     font-weight: 400;
     padding: 0;
   }
-  .custom-menu .menu .menu-item a::after {
+  .pnh-custom-menu--main .pnh-custom-menu .menu-item a::after {
     display: none;
   }
 }
-.custom-menu .menu .menu-item {
+.pnh-custom-menu--main .pnh-custom-menu .menu-item {
   height: 100%;
 }
-.custom-menu .menu .menu-item.active a::after {
-  height: 3px;
+.pnh-custom-menu--main .pnh-custom-menu .menu-item.active a::after {
+  height: var(--pnh-menu-active-indicator-height, 3px);
 }
-.custom-menu .menu .menu-item a {
+.pnh-custom-menu--main .pnh-custom-menu .menu-item a {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -127,17 +54,18 @@ body:not(.menu-open) .burger:hover .burger-inner::after {
   justify-content: center;
   padding-inline: 1rem;
   height: 100%;
+  color: inherit;
 }
-.custom-menu .menu .menu-item a:hover::after {
-  height: 3px;
+.pnh-custom-menu--main .pnh-custom-menu .menu-item a:hover::after {
+  height: var(--pnh-menu-active-indicator-height, 3px);
 }
-.custom-menu .menu .menu-item a::after {
+.pnh-custom-menu--main .pnh-custom-menu .menu-item a::after {
   position: absolute;
   content: "";
-  width: 24px;
+  width: var(--pnh-menu-active-indicator-width, 24px);
   height: 0px;
   bottom: 0;
-  border-radius: 2px;
+  border-radius: var(--pnh-menu-active-indicator-radius, 2px);
   background-color: currentColor;
   transition: all 250ms ease-in-out;
   will-change: height, background-color;
