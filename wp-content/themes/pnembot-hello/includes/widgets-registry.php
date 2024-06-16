@@ -11,7 +11,8 @@ class Widget_Registry {
 
   private $widgets = array(
     'terms-carousel'=>'\Pnembot\Hello\Widgets\Terms_Carousel',
-    'custom-menu'=>'\Pnembot\Hello\Widgets\Custom_Menu'
+    'custom-menu'=>'\Pnembot\Hello\Widgets\Custom_Menu',
+    'taxonomy-carousel'=>'\Pnembot\Hello\Widgets\Taxonomy_Carousel'
   );
 
   private function __construct() {
@@ -56,10 +57,10 @@ class Widget_Registry {
     );
   }
 
-  public static function get_instance( $shortcodes = array() ) {
+  public static function get_instance() {
 
     if ( null == self::$instance ) {
-      self::$instance = new self( $shortcodes );
+      self::$instance = new self();
     }
     return self::$instance;
   }
