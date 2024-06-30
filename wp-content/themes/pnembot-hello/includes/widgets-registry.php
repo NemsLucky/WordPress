@@ -10,9 +10,10 @@ class Widget_Registry {
   private static $instance = null;
 
   private $widgets = array(
-    'terms-carousel'=>'\Pnembot\Hello\Widgets\Terms_Carousel',
+    // 'terms-carousel'=>'\Pnembot\Hello\Widgets\Terms_Carousel',
     'custom-menu'=>'\Pnembot\Hello\Widgets\Custom_Menu',
-    'taxonomy-carousel'=>'\Pnembot\Hello\Widgets\Taxonomy_Carousel'
+    // 'taxonomy-carousel'=>'\Pnembot\Hello\Widgets\Taxonomy_Carousel',
+    'svg-icon'=>'\Pnembot\Hello\Widgets\Svg_Icon'
   );
 
   private function __construct() {

@@ -317,7 +317,7 @@ class Taxonomy_Carousel extends Widget_Base
 
 }
 
-add_action("wp_enqueue_scripts", function () {
+add_action("wp_footer", function () {
     wp_register_script('taxonomy-carousel-ajax', get_template_directory_uri() . '/includes/widgets/assets/taxonomy-carousel.js', ['jquery', 'json2']);
 
     wp_localize_script('taxonomy-carousel-ajax', 'taxonomy_carousel_ajax', [

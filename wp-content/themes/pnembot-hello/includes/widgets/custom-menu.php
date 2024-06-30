@@ -274,7 +274,7 @@ class Custom_Menu extends Widget_Base
             ]
         );
 
-				$this->end_controls_section();
+        $this->end_controls_section();
 
         $this->start_controls_section(
             'section_style_indicator',
@@ -284,56 +284,56 @@ class Custom_Menu extends Widget_Base
             ]
         );
 
-				$this->add_responsive_control(
-					'menu_item_active_indicator_height',
-					[
-							'label' => esc_html__('Height', 'pnembot-hello'),
-							'type' => Controls_Manager::SLIDER,
-							'size_units' => ['px', 'em', 'rem', 'custom'],
-							'range' => [
-									'px' => [
-											'min'=>2,
-											'max' => 16,
-									],
-									'em' => [
-											'min'=>0.125,
-											'max' => 1,
-									],
-									'rem' => [
-											'min'=>0.125,
-											'max' => 1,
-									],
-							],
-							'default'=>"3px",
-							'selectors' => [
-									'{{WRAPPER}}' => '--pnh-menu-active-indicator-height: {{SIZE}}{{UNIT}}; --pnh-menu-active-indicator-radius: calc( {{SIZE}}{{UNIT}} / 2);',
-							],
-					]
-			);
+        $this->add_responsive_control(
+            'menu_item_active_indicator_height',
+            [
+                'label' => esc_html__('Height', 'pnembot-hello'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem', 'custom'],
+                'range' => [
+                    'px' => [
+                        'min' => 2,
+                        'max' => 16,
+                    ],
+                    'em' => [
+                        'min' => 0.125,
+                        'max' => 1,
+                    ],
+                    'rem' => [
+                        'min' => 0.125,
+                        'max' => 1,
+                    ],
+                ],
+                'default' => "3px",
+                'selectors' => [
+                    '{{WRAPPER}}' => '--pnh-menu-active-indicator-height: {{SIZE}}{{UNIT}}; --pnh-menu-active-indicator-radius: calc( {{SIZE}}{{UNIT}} / 2);',
+                ],
+            ]
+        );
 
-			$this->add_responsive_control(
-					'menu_item_active_indicator_width',
-					[
-							'label' => esc_html__('width', 'pnembot-hello'),
-							'type' => Controls_Manager::SLIDER,
-							'size_units' => ['px', 'em', 'rem', 'custom'],
-							'range' => [
-									'px' => [
-											'max' => 100,
-									],
-									'em' => [
-											'max' => 10,
-									],
-									'rem' => [
-											'max' => 10,
-									],
-							],
-							'default'=>'24px',
-							'selectors' => [
-									'{{WRAPPER}}' => '--pnh-menu-active-indicator-width: {{SIZE}}{{UNIT}};',
-							],
-					]
-			);
+        $this->add_responsive_control(
+            'menu_item_active_indicator_width',
+            [
+                'label' => esc_html__('width', 'pnembot-hello'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', 'rem', 'custom'],
+                'range' => [
+                    'px' => [
+                        'max' => 100,
+                    ],
+                    'em' => [
+                        'max' => 10,
+                    ],
+                    'rem' => [
+                        'max' => 10,
+                    ],
+                ],
+                'default' => '24px',
+                'selectors' => [
+                    '{{WRAPPER}}' => '--pnh-menu-active-indicator-width: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
 
         $this->end_controls_section();
     }
@@ -377,13 +377,14 @@ class Custom_Menu extends Widget_Base
         ?>
 					<nav <?php $this->print_render_attribute_string('main-menu');?>>
 						<?php
-							// PHPCS - escaped by WordPress with "wp_nav_menu"
-							echo $menu_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						?>
+// PHPCS - escaped by WordPress with "wp_nav_menu"
+        echo $menu_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        ?>
 					</nav>
 				<?php
-		}
+}
 
-		public function render_plain_content() {}
+    public function render_plain_content()
+    {}
 
 }
