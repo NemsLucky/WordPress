@@ -37,6 +37,10 @@ class Hotspot extends Widget_Image {
 		return [ 'image', 'tooltip', 'CTA', 'dot' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 		parent::register_controls();
 
@@ -92,7 +96,6 @@ class Hotspot extends Widget_Image {
 				'dynamic' => [
 					'active' => true,
 				],
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
 			]
 		);
 
@@ -106,6 +109,9 @@ class Hotspot extends Widget_Image {
 			]
 		);
 
+		$start = is_rtl() ? 'right' : 'left';
+		$end = is_rtl() ? 'left' : 'right';
+
 		$repeater->add_control(
 			'hotspot_icon_position',
 			[
@@ -113,12 +119,12 @@ class Hotspot extends Widget_Image {
 				'type' => Controls_Manager::CHOOSE,
 				'options' => [
 					'start' => [
-						'title' => esc_html__( 'Icon Start', 'elementor-pro' ),
-						'icon' => 'eicon-h-align-left',
+						'title' => esc_html__( 'Start', 'elementor-pro' ),
+						'icon' => "eicon-h-align-{$start}",
 					],
 					'end' => [
-						'title' => esc_html__( 'Icon End', 'elementor-pro' ),
-						'icon' => 'eicon-h-align-right',
+						'title' => esc_html__( 'End', 'elementor-pro' ),
+						'icon' => "eicon-h-align-{$end}",
 					],
 				],
 				'selectors_dictionary' => [
@@ -994,6 +1000,10 @@ class Hotspot extends Widget_Image {
 	protected function render() {
 		$settings = $this->get_settings_for_display();
 
+		if ( empty( $settings['image']['url'] ) ) {
+			return;
+		}
+
 		$is_tooltip_direction_animation = 'e-hotspot--slide-direction' === $settings['tooltip_animation'] || 'e-hotspot--fade-direction' === $settings['tooltip_animation'];
 		$show_tooltip = 'none' === $settings['tooltip_trigger'];
 		$sequenced_animation_class = 'yes' === $settings['hotspot_sequenced_animation'] ? 'e-hotspot--sequenced' : '';
@@ -1137,6 +1147,9 @@ class Hotspot extends Widget_Image {
 
 		const imageUrl = elementor.imagesManager.getImageUrl( image );
 
+		if ( ! imageUrl ) {
+			return;
+		}
 		#>
 		<img src="{{ imageUrl }}" title="" alt="">
 		<#

@@ -235,11 +235,7 @@ class Plugin {
 
 		wp_set_script_translations( 'elementor-pro-frontend', 'elementor-pro', ELEMENTOR_PRO_PATH . 'languages' );
 
-		if ( self::elementor()->experiments->is_feature_active( 'e_optimized_assets_loading' ) ) {
-			wp_enqueue_script( 'pro-elements-handlers' );
-		} else {
-			wp_enqueue_script( 'pro-preloaded-elements-handlers' );
-		}
+		wp_enqueue_script( 'pro-elements-handlers' );
 
 		$assets_url = ELEMENTOR_PRO_ASSETS_URL;
 
@@ -284,10 +280,6 @@ class Plugin {
 			'ElementorProFrontendConfig',
 			$locale_settings
 		);
-
-		if ( $this->is_assets_loader_exist() ) {
-			$this->register_assets();
-		}
 	}
 
 	public function register_frontend_scripts() {
@@ -312,16 +304,6 @@ class Plugin {
 		);
 
 		wp_register_script(
-			'pro-preloaded-elements-handlers',
-			ELEMENTOR_PRO_URL . 'assets/js/preloaded-elements-handlers' . $suffix . '.js',
-			[
-				'elementor-frontend',
-			],
-			ELEMENTOR_PRO_VERSION,
-			true
-		);
-
-		wp_register_script(
 			'smartmenus',
 			ELEMENTOR_PRO_URL . 'assets/lib/smartmenus/jquery.smartmenus' . $suffix . '.js',
 			[
@@ -331,16 +313,20 @@ class Plugin {
 			true
 		);
 
-		if ( ! $this->is_assets_loader_exist() ) {
-			wp_register_script(
-				'elementor-sticky',
-				ELEMENTOR_PRO_URL . 'assets/lib/sticky/jquery.sticky' . $suffix . '.js',
-				[
-					'jquery',
-				],
-				ELEMENTOR_PRO_VERSION,
-				true
-			);
+		$sticky_handle = $this->is_assets_loader_exist() ? 'e-sticky' : 'elementor-sticky';
+
+		wp_register_script(
+			$sticky_handle,
+			ELEMENTOR_PRO_URL . 'assets/lib/sticky/jquery.sticky' . $suffix . '.js',
+			[
+				'jquery',
+			],
+			ELEMENTOR_PRO_VERSION,
+			true
+		);
+
+		if ( $this->is_assets_loader_exist() ) {
+			$this->register_assets();
 		}
 	}
 

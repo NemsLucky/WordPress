@@ -2162,17 +2162,17 @@ class Mega_Menu extends Widget_Nested_Base {
 		ob_start();
 		?>
 			<li <?php echo wp_kses_post( $this->get_render_attribute_string( $key ) ); ?> >
-				<div <?php echo $this->get_title_container_opening_tag( $item, $item['item_link']['url'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<?php echo $this->get_title_container_opening_tag( $item, $item['item_link']['url'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<?php if ( $menu_item_icon ) { ?>
 						<span class="e-n-menu-icon">
 							<span class="icon-active"><?php echo $menu_item_active_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 							<span class="icon-inactive"><?php echo $menu_item_icon; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 						</span>
 					<?php } ?>
-					<?php echo $this->get_title_link_opening_tag( $item, $item['item_link']['url'], $display_index ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<span class="e-n-menu-title-text">
 						<?php echo $item['item_title']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-					<?php echo $this->get_title_link_closing_tag( $item['item_link']['url'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</div>
+					</span>
+				<?php echo $this->get_title_container_closing_tag( $item['item_link']['url'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?php if ( $has_dropdown_content ) { ?>
 					<button <?php echo wp_kses_post( $this->get_render_attribute_string( $key . '_link' ) ); ?> >
 						<span class="e-n-menu-dropdown-icon-opened">
@@ -2280,11 +2280,19 @@ class Mega_Menu extends Widget_Nested_Base {
 
 	private function get_title_container_opening_tag( $item, $url ) {
 		$title_container_id = 'e-n-menu-title-container-' . $item['_id'];
+		$container_classes = [ 'e-n-menu-title-container' ];
+
+		if ( ! empty( $url ) ) {
+			array_push( $container_classes, 'e-focus', 'e-link' );
+		}
 
 		$this->remove_render_attribute( $title_container_id );
+
 		$this->add_render_attribute( $title_container_id, [
-			'class' => [ 'e-n-menu-title-container' ],
+			'class' => $container_classes,
 		] );
+
+		$this->add_link_attributes( $title_container_id, $item['item_link'] );
 
 		$current_class = $this->get_current_menu_item_class( $url );
 
@@ -2292,42 +2300,19 @@ class Mega_Menu extends Widget_Nested_Base {
 			$this->add_render_attribute( $title_container_id, 'aria-current', 'page' );
 		}
 
-		return $this->get_render_attribute_string( $title_container_id );
-	}
-
-	private function get_title_link_opening_tag( $item, $url, $display_index ) {
-		$link_id = 'e-n-menu-title-text-' . $item['_id'];
-		$link_classes = [ 'e-n-menu-title-text', 'e-link' ];
+		$container_attributes = $this->get_render_attribute_string( $title_container_id );
 
 		if ( ! empty( $url ) ) {
-			$link_classes[] = 'e-focus';
-		}
-
-		$this->remove_render_attribute( $link_id );
-		$this->add_render_attribute( $link_id, [
-			'class' => $link_classes,
-		] );
-		$this->add_link_attributes( $link_id, $item['item_link'] );
-
-		$opening_tag = '<span class="e-n-menu-title-text">';
-
-		$tag_content = $this->get_render_attribute_string( $link_id );
-
-		if ( ! empty( $url ) ) {
-			$opening_tag = '<a ' . $tag_content . '>';
+			$opening_tag = '<a ' . $container_attributes . '>';
+		} else {
+			$opening_tag = '<div ' . $container_attributes . '>';
 		}
 
 		return $opening_tag;
 	}
 
-	private function get_title_link_closing_tag( $url ) {
-		$closing_tag = '</span>';
-
-		if ( $url ) {
-			$closing_tag = '</a>';
-		}
-
-		return $closing_tag;
+	private function get_title_container_closing_tag( $url ) {
+		return ! empty( $url ) ? '</a>' : '</div>';
 	}
 
 	/**
@@ -2425,24 +2410,23 @@ class Mega_Menu extends Widget_Nested_Base {
 							'style': '--n-menu-title-order: ' + menuItemCount + ';',
 						} );
 
-						const menuItemLinkClasses = [ 'e-n-menu-title-text' ];
-
-						if ( !! item.item_link.url ) {
-							menuItemLinkClasses.push( 'e-link' );
-							menuItemLinkClasses.push( 'e-focus' );
-						}
-
 						view.addRenderAttribute( menuItemTitleKey, {
-							'class': menuItemLinkClasses,
-							'href': item.item_link.url,
+							'class': [ 'e-n-menu-title-text' ],
 							'data-binding-type': 'repeater-item',
 							'data-binding-repeater-name': 'menu_items',
 							'data-binding-setting': ['item_title'],
 							'data-binding-index': menuItemCount,
 						} );
 
+						const menuItemContainerClasses = [ 'e-n-menu-title-container' ];
+
+						if ( !! item.item_link.url ) {
+							menuItemContainerClasses.push( 'e-link', 'e-focus' );
+						}
+
 						view.addRenderAttribute( menuItemTitleContainerLinkKey, {
-							'class': [ 'e-n-menu-title-container' ],
+							'class': menuItemContainerClasses,
+							'href': item.item_link.url,
 							'aria-current': 'page',
 						} );
 
@@ -2457,27 +2441,26 @@ class Mega_Menu extends Widget_Nested_Base {
 					#>
 
 					<li {{{ view.getRenderAttributeString( menuItemWrapperKey ) }}}>
-						<div {{{ view.getRenderAttributeString( menuItemTitleContainerLinkKey ) }}}>
+						<# if ( menuItemLink ) { #>
+							<a {{{ view.getRenderAttributeString( menuItemTitleContainerLinkKey ) }}}>
+						<# } else { #>
+							<div {{{ view.getRenderAttributeString( menuItemTitleContainerLinkKey ) }}}>
+						<# } #>
 
-							<# if (menuIcon.value) { #>
-								<span class="e-n-menu-icon">
-									<span class="icon-active" >{{{ menuIconActive.value }}}</span>
-									<span class="icon-inactive">{{{ menuIcon.value }}}</span>
-								</span>
-							<# } #>
+						<# if (menuIcon.value) { #>
+							<span class="e-n-menu-icon">
+								<span class="icon-active" >{{{ menuIconActive.value }}}</span>
+								<span class="icon-inactive">{{{ menuIcon.value }}}</span>
+							</span>
+						<# } #>
 
-							<# if ( menuItemLink ) { #>
-								<a {{{ view.getRenderAttributeString( menuItemTitleKey ) }}}>
-							<# } else { #>
-								<span class="e-n-menu-title-text">
-							<# } #>
-								{{{ item.item_title }}}
-							<# if ( menuItemLink ) { #>
-								</a>
-							<# } else { #>
-								</span>
-							<# } #>
-						</div>
+						<span class="e-n-menu-title-text">{{{ item.item_title }}}</span>
+
+						<# if ( menuItemLink ) { #>
+							</a>
+						<# } else { #>
+							</div>
+						<# } #>
 
 						<# if ( hasDropdownContent ) { #>
 							<button {{{ view.getRenderAttributeString( menuItemDropdownIconKey ) }}}>
@@ -2498,6 +2481,133 @@ class Mega_Menu extends Widget_Nested_Base {
 			</div>
 		</nav>
 		<# } #>
+		<?php
+	}
+
+
+	protected function get_initial_config(): array {
+		if ( Plugin::elementor()->experiments->is_feature_active( 'e_nested_atomic_repeaters' ) ) {
+			return array_merge( parent::get_initial_config(), [
+				'support_improved_repeaters' => true,
+				'target_container' => [ '.e-n-menu-heading' ],
+				'node' => 'li',
+			] );
+		}
+
+		return parent::get_initial_config();
+	}
+
+	protected function content_template_single_repeater_item() {
+		?>
+		<#
+		const menuItemIcon = elementor.helpers.renderIcon( view, view.container.settings.attributes.menu_item_icon, { 'aria-hidden': true }, 'i' , 'object' ) ?? '',
+			menuItemIconActive = elementor.helpers.renderIcon( view, view.container.settings.attributes.menu_item_icon_active, { 'aria-hidden': true }, 'i' , 'object' ) ?? '',
+			elementUid = view.getIDInt().toString().substr( 0, 3 ),
+			permalinkUrl = '<?php echo esc_url( $this->get_permalink_for_current_page() ); ?>',
+			menuItemCount = view.collection.length + 1,
+			menuItemUid = view.getIDInt().toString().substr( 0, 3 ) + menuItemCount,
+			menuItemWrapperKey = menuItemUid,
+			menuItemTitleKey = 'menu-title-' + menuItemUid,
+			menuItemTitleContainerLinkKey = 'e-n-menu-title-container-' + menuItemUid,
+			menuItemDropdownIconKey = 'e-n-menu-dropdown-icon-' + menuItemUid,
+			menuItemIconKey = 'menu-icon-' + menuItemUid,
+			menuIcon = elementor.helpers.renderIcon( view, data.item_icon, { 'aria-hidden': true }, 'i' , 'object' ) ?? '',
+			menuIconActive = '' === data.item_icon_active.value
+				? menuIcon
+				: elementor.helpers.renderIcon( view, data.item_icon_active, { 'aria-hidden': true }, 'i' , 'object' ),
+			menuItemLink = 'string' === typeof data['item_link'] ? data['item_link'] : data['item_link']['url'],
+			hasDropdownContent =  'yes' === data['item_dropdown_content'],
+			currentPageClass = elementorPro.modules.megaMenu.getCurrentMenuItemClass( menuItemLink, permalinkUrl ),
+			dropdownFocusClass = hasDropdownContent ? 'e-focus' : '',
+			menuItemClassList = ['e-n-menu-title'];
+			let menuItemId = 'e-n-menu-title-' + menuItemUid,
+			menuItemLinkClasses = [ 'e-n-menu-title-text' ];
+
+		if ( '' !== data.element_id ) {
+			menuItemId = data.element_id;
+		}
+
+		if ( ! hasDropdownContent ) {
+			menuItemClassList.push( 'link-only' );
+		} else {
+			menuItemClassList.push( 'e-click' );
+		}
+
+		if ( !! currentPageClass ) {
+			menuItemClassList.push( currentPageClass );
+		}
+
+		view.addRenderAttribute( menuItemWrapperKey, {
+			'id': menuItemId,
+			'class': menuItemClassList,
+			'style': '--n-menu-title-order: ' + menuItemCount + ';',
+		}, null, true );
+
+		if ( !! data.item_link.url ) {
+			menuItemLinkClasses.push( 'e-link', 'e-focus' );
+		}
+
+		view.addRenderAttribute( menuItemTitleKey, {
+			'class': menuItemLinkClasses,
+			'href': data.item_link.url,
+			'data-binding-type': 'repeater-item',
+			'data-binding-repeater-name': 'menu_items',
+			'data-binding-setting': ['item_title'],
+			'data-binding-index': menuItemCount,
+		}, null, true );
+
+		view.addRenderAttribute( menuItemTitleContainerLinkKey, {
+			'class': [ 'e-n-menu-title-container' ],
+			'aria-current': 'page',
+		}, null, true );
+
+		view.addRenderAttribute( menuItemDropdownIconKey, {
+			'id': 'e-n-menu-dropdown-icon-' + menuItemUid,
+			'class': [ 'e-n-menu-dropdown-icon', 'e-focus' ],
+			'data-tab-index': menuItemCount,
+			'aria-haspopup': hasDropdownContent ? 'true' : 'false',
+			'aria-expanded': 'false',
+			'aria-controls': 'e-n-menu-content-' + menuItemUid,
+		}, null, true );
+		#>
+		<li {{{ view.getRenderAttributeString( menuItemWrapperKey ) }}}>
+			<div {{{ view.getRenderAttributeString( menuItemTitleContainerLinkKey ) }}}>
+
+				<# if (menuIcon.value) { #>
+					<span class="e-n-menu-icon">
+						<span class="icon-active" >{{{ menuIconActive.value }}}</span>
+						<span class="icon-inactive">{{{ menuIcon.value }}}</span>
+					</span>
+				<# } #>
+
+				<# if ( menuItemLink ) { #>
+					<a {{{ view.getRenderAttributeString( menuItemTitleKey ) }}}>
+				<# } else { #>
+					<span class="e-n-menu-title-text">
+				<# } #>
+
+				{{{ data.item_title }}}
+
+				<# if ( menuItemLink ) { #>
+					</a>
+				<# } else { #>
+					</span>
+				<# } #>
+			</div>
+
+			<# if ( hasDropdownContent ) { #>
+			<button {{{ view.getRenderAttributeString( menuItemDropdownIconKey ) }}}>
+					<span class="e-n-menu-dropdown-icon-opened">
+						{{{ menuItemIconActive.value }}}
+						<span class="elementor-screen-only"><?php echo esc_html__( 'Close ', 'elementor-pro' ); ?>{{{ data.item_title }}}</span>
+					</span>
+				<span class="e-n-menu-dropdown-icon-closed">
+						{{{ menuItemIcon.value }}}
+						<span class="elementor-screen-only"><?php echo esc_html__( 'Open ', 'elementor-pro' ); ?>{{{ data.item_title }}}</span>
+					</span>
+			</button>
+			<# } #>
+		</li>
 		<?php
 	}
 }

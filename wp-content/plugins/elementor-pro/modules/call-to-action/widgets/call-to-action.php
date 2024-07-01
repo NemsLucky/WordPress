@@ -39,6 +39,10 @@ class Call_To_Action extends Base_Widget {
 		return [ 'call to action', 'cta', 'button' ];
 	}
 
+	protected function is_dynamic_content(): bool {
+		return false;
+	}
+
 	protected function register_controls() {
 		$this->start_controls_section(
 			'section_main_image',
@@ -193,40 +197,6 @@ class Call_To_Action extends Base_Widget {
 		);
 
 		$this->add_control(
-			'icon_view',
-			[
-				'label' => esc_html__( 'View', 'elementor-pro' ),
-				'type' => Controls_Manager::SELECT,
-				'options' => [
-					'default' => esc_html__( 'Default', 'elementor-pro' ),
-					'stacked' => esc_html__( 'Stacked', 'elementor-pro' ),
-					'framed' => esc_html__( 'Framed', 'elementor-pro' ),
-				],
-				'default' => 'default',
-				'condition' => [
-					'graphic_element' => 'icon',
-				],
-			]
-		);
-
-		$this->add_control(
-			'icon_shape',
-			[
-				'label' => esc_html__( 'Shape', 'elementor-pro' ),
-				'type' => Controls_Manager::SELECT,
-				'options' => [
-					'circle' => esc_html__( 'Circle', 'elementor-pro' ),
-					'square' => esc_html__( 'Square', 'elementor-pro' ),
-				],
-				'default' => 'circle',
-				'condition' => [
-					'icon_view!' => 'default',
-					'graphic_element' => 'icon',
-				],
-			]
-		);
-
-		$this->add_control(
 			'title',
 			[
 				'label' => esc_html__( 'Title', 'elementor-pro' ),
@@ -321,8 +291,6 @@ class Call_To_Action extends Base_Widget {
 				'dynamic' => [
 					'active' => true,
 				],
-				'placeholder' => esc_html__( 'https://your-link.com', 'elementor-pro' ),
-
 			]
 		);
 
@@ -649,6 +617,40 @@ class Call_To_Action extends Base_Widget {
 				],
 				'condition' => [
 					'graphic_element' => 'image',
+				],
+			]
+		);
+
+		$this->add_control(
+			'icon_view',
+			[
+				'label' => esc_html__( 'View', 'elementor-pro' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'default' => esc_html__( 'Default', 'elementor-pro' ),
+					'stacked' => esc_html__( 'Stacked', 'elementor-pro' ),
+					'framed' => esc_html__( 'Framed', 'elementor-pro' ),
+				],
+				'default' => 'default',
+				'condition' => [
+					'graphic_element' => 'icon',
+				],
+			]
+		);
+
+		$this->add_control(
+			'icon_shape',
+			[
+				'label' => esc_html__( 'Shape', 'elementor-pro' ),
+				'type' => Controls_Manager::SELECT,
+				'options' => [
+					'circle' => esc_html__( 'Circle', 'elementor-pro' ),
+					'square' => esc_html__( 'Square', 'elementor-pro' ),
+				],
+				'default' => 'circle',
+				'condition' => [
+					'icon_view!' => 'default',
+					'graphic_element' => 'icon',
 				],
 			]
 		);
@@ -1671,20 +1673,14 @@ class Call_To_Action extends Base_Widget {
 
 		$this->add_render_attribute( 'wrapper', 'class', 'elementor-cta' );
 
-		$background_selector = "background-image: url($bg_image);";
-
-		$is_lazyload_active = Plugin::elementor()->experiments->is_feature_active( 'e_lazyload' );
-		$is_edit_mode = Plugin::elementor()->editor->is_edit_mode();
-
-		if ( $print_bg && ! $is_edit_mode && $is_lazyload_active ) {
-			$background_selector = "background-image: var(--e-bg-lazyload-loaded); --e-bg-lazyload: url($bg_image);";
-			$this->add_render_attribute( 'wrapper', 'data-e-bg-lazyload', '.elementor-bg' );
-		}
+		/*$this->add_render_attribute( 'background_image', 'style', [
+			'background-image: url(' . $bg_image . ');',
+		] );*/
 
 		$this->add_render_attribute(
 			'background_image',
 			[
-				'style' => $background_selector,
+				'style' => 'background-image: url(' . esc_url( $bg_image ) . ');',
 				'role' => 'img',
 				'aria-label' => Control_Media::get_image_alt( $settings['bg_image'] ),
 			]

@@ -1,4 +1,4 @@
-/*! elementor-pro - v3.20.0 - 26-03-2024 */
+/*! elementor-pro - v3.22.0 - 24-06-2024 */
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
@@ -3712,6 +3712,49 @@ module.exports = function () {
 
 /***/ }),
 
+/***/ "../modules/loop-builder/assets/js/editor/behavior.js":
+/*!************************************************************!*\
+  !*** ../modules/loop-builder/assets/js/editor/behavior.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({
+  value: true
+}));
+exports["default"] = void 0;
+class LoopBuilderBehavior extends Marionette.Behavior {
+  ui() {
+    return {
+      postSourceControlSelector: '[data-setting="post_taxonomy_query_post_type"]',
+      productSourceControlSelector: '[data-setting="product_taxonomy_query_post_type"]'
+    };
+  }
+  events() {
+    return {
+      'change @ui.postSourceControlSelector': 'onApplySourceChange',
+      'change @ui.productSourceControlSelector': 'onApplySourceChange'
+    };
+  }
+  onApplySourceChange(event) {
+    const sourceType = event.target?.value || this.getDefaultSourceType();
+    this.getOption('updateTaxonomyTabsIdControls')(sourceType, true);
+  }
+  onRender() {
+    const postType = this.getOption('getSourceControlValue')();
+    this.getOption('updateTaxonomyTabsIdControls')(postType);
+  }
+  getDefaultSourceType() {
+    const skinType = this.getOption('getSkinType')();
+    return this.getOption('getDefaultSourceType')(skinType);
+  }
+}
+exports["default"] = LoopBuilderBehavior;
+
+/***/ }),
+
 /***/ "../modules/loop-builder/assets/js/editor/component.js":
 /*!*************************************************************!*\
   !*** ../modules/loop-builder/assets/js/editor/component.js ***!
@@ -3861,16 +3904,31 @@ var _default = exports["default"] = LoopBuilderAddLibraryTab;
 var _interopRequireDefault = __webpack_require__(/*! @babel/runtime/helpers/interopRequireDefault */ "../node_modules/@babel/runtime/helpers/interopRequireDefault.js");
 var _documentHandle = _interopRequireWildcard(__webpack_require__(/*! elementor-pro/preview/utils/document-handle */ "../assets/dev/js/preview/utils/document-handle.js"));
 var _component = _interopRequireDefault(__webpack_require__(/*! ./component */ "../modules/loop-builder/assets/js/editor/component.js"));
+var _behavior = _interopRequireDefault(__webpack_require__(/*! ./behavior */ "../modules/loop-builder/assets/js/editor/behavior.js"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 class loopBuilderModule extends elementorModules.editor.utils.Module {
+  taxonomyQueryOptions = ['post_taxonomy', 'product_taxonomy'];
   onElementorFrontendInit() {
+    elementor.hooks.addFilter('controls/base/behaviors', this.registerControlBehavior);
     elementorFrontend.elements.$body.on('click', '.e-loop-empty-view__box-cta', () => {
       this.createTemplate();
     });
     this.createDocumentSaveHandles();
     elementor.on('document:loaded', this.createDocumentSaveHandles.bind(this));
   }
+  registerControlBehavior = (behaviors = {}, view) => {
+    const taxonomyQueryOptions = ['post_taxonomy_query_post_type', 'product_taxonomy_query_post_type'];
+    if (!taxonomyQueryOptions.includes(view.options.model.get('name'))) {
+      return behaviors;
+    }
+    behaviors.loopBuilder = {
+      behaviorClass: _behavior.default,
+      getSourceControlValue: this.getSourceControlValue,
+      updateTaxonomyTabsIdControls: this.updateTaxonomyTabsIdControls
+    };
+    return behaviors;
+  };
   createTemplate() {
     setTimeout(() => {
       elementor.getPanelView().getCurrentPageView().activateSection('section_layout')._renderChildren();
@@ -3902,45 +3960,117 @@ class loopBuilderModule extends elementorModules.editor.utils.Module {
   onElementorLoaded() {
     elementor.on('document:loaded', this.onDocumentLoaded.bind(this));
     elementor.on('document:unload', this.onDocumentUnloaded.bind(this));
-    this.onApplySourceChange = this.onApplySourceChange.bind(this);
     this.component = $e.components.register(new _component.default({
       manager: this
     }));
   }
-  onDocumentLoaded(document) {
+  onDocumentLoaded = document => {
     if (!document.config.theme_builder) {
       return;
     }
     elementor.channels.editor.on('elementorLoopBuilder:ApplySourceChange', this.onApplySourceChange);
-  }
-  onDocumentUnloaded(document) {
+  };
+  onDocumentUnloaded = document => {
     if (!document.config.theme_builder) {
       return;
     }
     elementor.channels.editor.off('elementorLoopBuilder:ApplySourceChange', this.onApplySourceChange);
-  }
-  onApplySourceChange() {
+  };
+  onApplySourceChange = () => {
     this.saveAndRefresh().then(() => {
       location.reload();
     });
-  }
+  };
   async saveAndRefresh() {
     await $e.run('document/save/update', {
       force: true
     });
   }
-  getCtaStyles() {
+  getCtaStyles = () => {
     const ctaStyle = document.createElement('link');
     ctaStyle.setAttribute('rel', 'stylesheet');
     ctaStyle.setAttribute('href', `${elementorAppProConfig.baseUrl}/assets/css/loop-grid-cta.css`);
     return ctaStyle;
-  }
-  getCtaContent(widgetName) {
+  };
+  getCtaContent = widgetName => {
     const ctaContent = document.createElement('div');
     ctaContent.classList.add('e-loop-empty-view__container', 'elementor-grid', widgetName);
     ctaContent.innerHTML = Marionette.Renderer.render('#tmpl-' + widgetName + '-cta');
     return ctaContent;
-  }
+  };
+  getSourceControlValue = () => {
+    const skinType = this.getSkinType(),
+      controlView = this.getEditorControlView(`${skinType}_query_post_type`);
+    if (!controlView) {
+      return skinType.includes('product') ? 'product_cat' : 'category';
+    }
+    return controlView.getControlValue();
+  };
+  getSkinType = () => {
+    const sectionLayout = this.getEditorControlView('section_layout');
+    return sectionLayout.options.container.settings.get('_skin');
+  };
+  getTemplateType = templateKey => {
+    return templateKey.split('_')[0];
+  };
+  onApplySkinChange = () => {
+    const skinType = this.getSkinType();
+    if (!this.taxonomyQueryOptions.includes(skinType)) {
+      return;
+    }
+    const postType = this.getDefaultSourceType(skinType);
+    this.updateTaxonomyTabsIdControls(postType, true);
+  };
+  getDefaultSourceType = skinType => {
+    const defaultSourceTypes = {
+      post: 'post',
+      product: 'product',
+      post_taxonomy: 'category',
+      product_taxonomy: 'product_cat'
+    };
+    return defaultSourceTypes[skinType];
+  };
+  updateTaxonomyTabsIdControls = (postType, shouldResetControlValues = false) => {
+    const skinType = this.getSkinType();
+    if (!this.taxonomyQueryOptions.includes(skinType)) {
+      return;
+    }
+    const querySectionView = elementorPro.modules.loopBuilder.getEditorControlView('section_query'),
+      includeIds = querySectionView.model.collection.findWhere({
+        name: `${skinType}_posts_ids`
+      }),
+      excludeIds = querySectionView.model.collection.findWhere({
+        name: `${skinType}_exclude_ids`
+      });
+    [includeIds, excludeIds].forEach(control => {
+      const controlView = elementor.getPanelView()?.getCurrentPageView()?.children?.findByModel(control);
+      this.updateControlQuery({
+        control,
+        controlView,
+        postType,
+        shouldResetControlValues
+      });
+    });
+  };
+  updateControlQuery = ({
+    control,
+    controlView,
+    postType,
+    shouldResetControlValues
+  }) => {
+    control.set({
+      autocomplete: {
+        object: 'tax',
+        query: {
+          taxonomy: postType
+        }
+      }
+    });
+    if (controlView && shouldResetControlValues) {
+      controlView.setValue([]);
+      controlView.applySavedValue();
+    }
+  };
 }
 module.exports = loopBuilderModule;
 
@@ -6441,7 +6571,7 @@ class ThemeBuilderModule extends elementorModules.editor.utils.Module {
   onSectionPreviewSettingsActive() {
     this.updatePreviewIdOptions(true);
   }
-  updatePreviewIdOptions(render) {
+  updatePreviewIdOptions = render => {
     let previewType = elementor.settings.page.model.get('preview_type');
     if (!previewType) {
       return;
@@ -6451,27 +6581,29 @@ class ThemeBuilderModule extends elementorModules.editor.utils.Module {
       controlModel = currentView.collection.findWhere({
         name: 'preview_id'
       });
+    const templateType = previewType[0],
+      sourceType = previewType[1];
     if ('author' === previewType[1]) {
       controlModel.set({
         autocomplete: {
           object: 'author'
         }
       });
-    } else if ('taxonomy' === previewType[0]) {
+    } else if (this.isTemplateTypeTaxonomyLoop(templateType)) {
       controlModel.set({
         autocomplete: {
           object: 'tax',
           query: {
-            taxonomy: previewType[1]
+            taxonomy: sourceType
           }
         }
       });
-    } else if ('single' === previewType[0]) {
+    } else if ('single' === templateType) {
       controlModel.set({
         autocomplete: {
           object: 'post',
           query: {
-            post_type: previewType[1]
+            post_type: sourceType
           }
         }
       });
@@ -6488,6 +6620,9 @@ class ThemeBuilderModule extends elementorModules.editor.utils.Module {
       controlView.render();
       controlView.$el.toggle(!!controlModel.get('autocomplete').object);
     }
+  };
+  isTemplateTypeTaxonomyLoop(templateType) {
+    return ['post_taxonomy', 'product_taxonomy'].includes(templateType);
   }
   async openSiteIdentity() {
     await $e.run('panel/global/open');
@@ -7333,6 +7468,17 @@ class WoocommerceModule extends elementorModules.editor.utils.Module {
   }
 }
 module.exports = WoocommerceModule;
+
+/***/ }),
+
+/***/ "react":
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+/***/ ((module) => {
+
+"use strict";
+module.exports = React;
 
 /***/ }),
 
@@ -9263,6 +9409,7 @@ $({ target: 'Array', proto: true, arity: 1, forced: FORCED }, {
 /******/ 			if (chunkId === "mega-menu-editor") return "" + chunkId + ".bbef3f7412481cbce555.bundle.js";
 /******/ 			if (chunkId === "nested-carousel-editor") return "" + chunkId + ".2fdc278ce6bc9f6ec2e0.bundle.js";
 /******/ 			if (chunkId === "loop-filter-editor") return "" + chunkId + ".d1bae86a5ed21c0e9981.bundle.js";
+/******/ 			if (chunkId === "off-canvas-editor") return "" + chunkId + ".537e5e064206eea190cc.bundle.js";
 /******/ 			if (chunkId === "modules_query-control_assets_js_editor_template-query-control_js") return "4abfbfd970d6f7680bc7.bundle.js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
@@ -9523,6 +9670,12 @@ var ElementorPro = Marionette.Application.extend({
         default: LoopFilter
       }) => {
         this.modules.loopFilter = new LoopFilter();
+      });
+    }
+    if (elementorCommon.config.experimentalFeatures['nested-elements']) {
+      elementorCommon.elements.$window.on('elementor/nested-element-type-loaded', async () => {
+        // The module should be loaded only when `nestedElements` is available.
+        this.modules.offCanvas = new (await __webpack_require__.e(/*! import() | off-canvas-editor */ "off-canvas-editor").then(__webpack_require__.bind(__webpack_require__, /*! modules/off-canvas/assets/js/editor/module */ "../modules/off-canvas/assets/js/editor/module.js"))).default();
       });
     }
   },
