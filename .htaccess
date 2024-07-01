@@ -14,3 +14,7 @@ RewriteRule . /index.php [L]
 </IfModule>
 
 # END WordPress
+
+<IfModule mod_substitute.c>
+SubstituteMaxLength 10M
+</IfModule>
