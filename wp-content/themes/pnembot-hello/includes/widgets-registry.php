@@ -48,7 +48,7 @@ class Widget_Registry {
     return true;
   }
 
-  private function register_categories(Elements_Manager $manager){
+  public function register_categories(Elements_Manager $manager){
     $manager->add_category(
       'pnembot-hello',
       [
